@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://seedingvn.vn/</loc>
+    <loc>https://id.seedingvn.vn/</loc>
     <lastmod>2024-07-14</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://seedingvn.vn/get-facebook-page-id</loc>
+    <loc>https://id.seedingvn.vn/get-facebook-page-id</loc>
+    <lastmod>2024-07-14</lastmod>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://id.seedingvn.vn/get-facebook-post-id</loc>
     <lastmod>2024-07-14</lastmod>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://seedingvn.vn/get-facebook-post-id</loc>
+    <loc>https://id.seedingvn.vn/get-facebook-group-id</loc>
     <lastmod>2024-07-14</lastmod>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://seedingvn.vn/get-facebook-group-id</loc>
+    <loc>https://id.seedingvn.vn/vi</loc>
+    <lastmod>2024-07-14</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://id.seedingvn.vn/vi/lay-id-trang-facebook</loc>
+    <lastmod>2024-07-14</lastmod>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://id.seedingvn.vn/vi/lay-id-bai-viet-facebook</loc>
+    <lastmod>2024-07-14</lastmod>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://id.seedingvn.vn/vi/lay-id-nhom-facebook</loc>
     <lastmod>2024-07-14</lastmod>
     <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://seedingvn.vn/vi</loc>
-    <lastmod>2024-07-14</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://seedingvn.vn/vi/lay-id-trang-facebook</loc>
-    <lastmod>2024-07-14</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://seedingvn.vn/vi/lay-id-bai-viet-facebook</loc>
-    <lastmod>2024-07-14</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://seedingvn.vn/vi/lay-id-nhom-facebook</loc>
-    <lastmod>2024-07-14</lastmod>
-    <priority>0.8</priority>
   </url>
 </urlset> 
