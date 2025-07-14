@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getApiKeyStatus } from "@/lib/api-utils"
+import { getApiKeyStatus, getApiCallLogs } from "@/lib/api-utils"
 
 export async function GET() {
   try {
@@ -18,7 +18,8 @@ export async function GET() {
         totalKeys: status.length,
         usagePercentage: totalLimit > 0 ? ((totalLimit - totalRemaining) / totalLimit * 100).toFixed(2) : '0'
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      logs: getApiCallLogs()
     })
   } catch (error) {
     console.error("Error getting API status:", error)

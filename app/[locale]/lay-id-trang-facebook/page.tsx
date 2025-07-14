@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     description: "Cách dễ nhất để tìm ID số cho bất kỳ Trang Facebook hoặc trang cá nhân nào. Miễn phí, nhanh chóng và bảo mật.",
     images: [
       {
-        url: "/social-image-id-finder-vi.png", // TODO: Thay thế đường dẫn ảnh
+        url: "/lay-id-trang-facebook.png", // TODO: Thay thế đường dẫn ảnh
         width: 1200,
         height: 630,
         alt: "Tìm ID Facebook với công cụ của Seedingvn.vn"
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Công Cụ Tìm ID Facebook (Page & Profile) | Seedingvn.vn",
     description: "Cách dễ nhất để tìm ID số cho bất kỳ Trang Facebook hoặc trang cá nhân nào. Miễn phí, nhanh chóng và bảo mật.",
-    images: ["/social-image-id-finder-vi.png"], // TODO: Thay thế đường dẫn ảnh
+    images: ["/lay-id-trang-facebook.png"], // TODO: Thay thế đường dẫn ảnh
   },
   
   // Correctly placed Schema Markup

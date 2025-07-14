@@ -15,7 +15,7 @@ interface IdExtractorFormProps {
 interface ExtractionResult {
   url: string
   id: string | null
-  status: "success" | "error" | "info"
+  extractionStatus: "success" | "error" | "info"
   message?: string
   copyFeedback: boolean // New state for individual copy button feedback
 }
@@ -32,12 +32,13 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
   const [extractionMode, setExtractionMode] = useState<"single" | "batch">("single") // Mode state
   const [isLoading, setIsLoading] = useState(false)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [batchCopyFeedback, setBatchCopyFeedback] = useState(false)
 
   const performExtraction = async (
     inputUrl: string,
-  ): Promise<{ id: string | null; messageType: "success" | "error" | "info"; message: string }> => {
+  ): Promise<{ id: string | null; extractionStatus: "success" | "error" | "info"; message: string; status?: number; latency?: number }> => {
     if (!inputUrl) {
-      return { id: null, messageType: "error", message: tString("common.invalidUrl") }
+      return { id: null, extractionStatus: "error", message: tString("common.invalidUrl") }
     }
 
     let apiEndpoint = ""
@@ -48,12 +49,14 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
     } else if (type === "group") {
       apiEndpoint = "/api/extract/group"
     } else {
-      return { id: null, messageType: "error", message: "Invalid extraction type" }
+      return { id: null, extractionStatus: "error", message: "Invalid extraction type" }
     }
 
     try {
       const response = await fetch(`${apiEndpoint}?link=${encodeURIComponent(inputUrl)}`)
       const data = await response.json()
+      const status = Number(response.headers.get('X-Api-Status')) || response.status;
+      const latency = Number(response.headers.get('X-Api-Latency')) || undefined;
 
       if (response.ok) {
         // Handle different response formats for each API type
@@ -67,24 +70,25 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
         }
         
         if (extracted) {
-          return { id: String(extracted), messageType: "success", message: "" }
+          return { id: String(extracted), extractionStatus: "success", message: "", status, latency }
         } else {
-          // If API returns success but no ID, it might be a custom URL that needs API
-          return { id: "N/A", messageType: "info", message: tString(`${type}IdPage.apiRequiredMessage`) || "" }
+          return { id: "N/A", extractionStatus: "error", message: tString("common.notFoundId"), status, latency }
         }
       } else {
         // Handle API errors
-        return { id: null, messageType: "error", message: data.error || tString("common.errorExtractingId") || "" }
+        return { id: null, extractionStatus: "error", message: data.error || tString("common.errorExtractingId") || "", status, latency }
       }
     } catch (e) {
       console.error("Network or API call error:", e)
-      return { id: null, messageType: "error", message: tString("common.errorExtractingId") || "" }
+      return { id: null, extractionStatus: "error", message: tString("common.errorExtractingId") || "" }
     }
   }
 
   const handleExtract = async () => {
     let urlForEvent = extractionMode === 'single' ? urlInput : urlsInputBatch;
     let idResultForEvent: string | null = null;
+    let statusForEvent: number | undefined = undefined;
+    let latencyForEvent: number | undefined = undefined;
 
     setIsLoading(true)
     setMessage(null)
@@ -94,22 +98,19 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
     setBatchResults([])
 
     if (extractionMode === "single") {
-      const { id, messageType: type, message: msg = "" } = await performExtraction(urlInput) // Await here
+      const { id, extractionStatus, message: msg = "", status, latency } = await performExtraction(urlInput)
       idResultForEvent = id || null;
+      statusForEvent = status;
+      latencyForEvent = latency;
 
-      if (id) {
+      if (id && id !== 'N/A') {
         setExtractedId(id)
-        if (type === "info") {
-          setMessage(msg)
-          setMessageType("info")
-        } else {
-          setMessage(null)
-          setMessageType(null)
-        }
+        setMessage(null)
+        setMessageType(null)
       } else {
-        setExtractedId(null)
-        setMessage(msg || "Error extracting ID")
-        setMessageType(type)
+        setExtractedId('N/A')
+        setMessage(msg || tString('common.notFoundId'))
+        setMessageType(extractionStatus)
       }
     } else {
       // Batch mode
@@ -123,24 +124,30 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
         return
       }
 
-      const resultsPromises: Promise<ExtractionResult>[] = urls.map(async (url) => {
-        const { id, messageType: type, message: msg = "" } = await performExtraction(url) // Await each extraction
+      type BatchResult = ExtractionResult & { apiStatus?: number; apiLatency?: number };
+      const resultsPromises: Promise<BatchResult>[] = urls.map(async (url) => {
+        const { id, extractionStatus, message: msg = "", status, latency } = await performExtraction(url)
         return {
           url,
           id,
-          status: type,
+          extractionStatus,
           message: msg,
           copyFeedback: false,
+          apiStatus: status,
+          apiLatency: latency,
         }
       })
-      const results = await Promise.all(resultsPromises) // Wait for all extractions to complete
+      const results = await Promise.all(resultsPromises)
       setBatchResults(results)
       idResultForEvent = results.map(r => r.id).filter(Boolean).join(", ");
+      // Lấy status/latency của lần đầu tiên (hoặc tổng hợp tuỳ ý)
+      statusForEvent = results[0]?.apiStatus;
+      latencyForEvent = results[0]?.apiLatency;
     }
 
     if (typeof window !== 'undefined') {
       (window as any).dataLayer = (window as any).dataLayer || [];
-      (window as any).dataLayer.push({ event: 'extract_id_click', extractionMode, type, url: urlForEvent, idresult: idResultForEvent });
+      (window as any).dataLayer.push({ event: 'extract_id_click', extractionMode, type, url: urlForEvent, idresult: idResultForEvent, apiStatus: statusForEvent, apiLatency: latencyForEvent });
     }
     setIsLoading(false)
   }
@@ -181,6 +188,8 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
 
     if (textToCopy) {
       navigator.clipboard.writeText(textToCopy)
+      setBatchCopyFeedback(true)
+      setTimeout(() => setBatchCopyFeedback(false), 1500)
       setMessage(tString("common.copied"))
       setMessageType("success")
       if (timeoutRef.current) {
@@ -256,7 +265,7 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
         </Button>
 
         {/* Display results for single mode (unified format) */}
-        {extractionMode === "single" && extractedId && (
+        {extractionMode === "single" && extractedId !== null && (
           <>
             <div className="border p-2 rounded-md bg-muted/20">
               <div className="flex items-center space-x-2">
@@ -264,9 +273,9 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => handleCopyToClipboard(extractedId)}
+                  onClick={() => extractedId && handleCopyToClipboard(extractedId)}
                   aria-label={tString("common.copyToClipboard")}
-                  disabled={!extractedId}
+                  disabled={!extractedId || extractedId === 'N/A'}
                   className="h-9 w-9 rounded-md hover:bg-accent bg-transparent"
                 >
                   {singleCopyFeedback ? <CheckIcon className="h-5 w-5 text-primary" /> : <CopyIcon className="h-5 w-5" />}
@@ -274,11 +283,16 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
                 </Button>
               </div>
             </div>
+            {(message && messageType) && (
+              <div className={`mt-2 text-sm ${messageType === 'error' ? 'text-red-600' : messageType === 'info' ? 'text-gray-600' : ''}`}>
+                {message}
+              </div>
+            )}
             <Button
               onClick={() => extractedId && handleCopyToClipboard(extractedId)}
               className="w-full h-9 text-xs md:text-sm bg-secondary text-secondary-foreground hover:bg-secondary/90 mt-2"
               variant="outline"
-              disabled={!extractedId}
+              disabled={!extractedId || extractedId === 'N/A'}
             >
               {tString("common.copyToClipboard")}
             </Button>
@@ -320,23 +334,9 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
               onClick={handleCopyAllResults}
               className="w-full h-10 text-sm md:text-base bg-secondary text-secondary-foreground hover:bg-secondary/90"
             >
-              {tString("common.copyAllResults")}
+              {batchCopyFeedback ? <CheckIcon className="h-5 w-5 text-primary mx-auto" /> : tString("common.copyAllResults")}
             </Button>
           </div>
-        )}
-
-        {message && (
-          <p
-            className={`text-center text-xs md:text-sm p-3 rounded-md ${
-              messageType === "error"
-                ? "text-destructive bg-destructive/10"
-                : messageType === "success"
-                  ? "text-primary bg-primary/10"
-                  : "text-muted-foreground bg-muted"
-            }`}
-          >
-            {message}
-          </p>
         )}
       </CardContent>
     </Card>

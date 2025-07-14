@@ -105,7 +105,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         {/* Tool Cards Grid */}
         <div className="mb-10">
         <div className="grid gap-6 md:grid-cols-3">
-            <Link href={`/${locale}/get-facebook-page-id`} className="group block h-full">
+            <Link href={`/${locale}/${locale === 'vi' ? 'lay-id-trang-facebook' : 'get-facebook-page-id'}`} className="group block h-full">
               <Card className="h-full flex flex-col justify-start items-start p-6 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 border border-border rounded-2xl text-left">
                 <CardContent className="flex flex-col items-start p-0 text-left w-full">
                   <div className="mb-4">
@@ -127,7 +127,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               </Card>
             </Link>
 
-            <Link href={`/${locale}/get-facebook-post-id`} className="group block h-full">
+            <Link href={`/${locale}/${locale === 'vi' ? 'lay-id-bai-viet-facebook' : 'get-facebook-post-id'}`} className="group block h-full">
               <Card className="h-full flex flex-col justify-start items-start p-6 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 border border-border rounded-2xl text-left">
                 <CardContent className="flex flex-col items-start p-0 text-left w-full">
                   <div className="mb-4">
@@ -149,7 +149,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               </Card>
             </Link>
 
-            <Link href={`/${locale}/get-facebook-group-id`} className="group block h-full">
+            <Link href={`/${locale}/${locale === 'vi' ? 'lay-id-nhom-facebook' : 'get-facebook-group-id'}`} className="group block h-full">
               <Card className="h-full flex flex-col justify-start items-start p-6 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 border border-border rounded-2xl text-left">
                 <CardContent className="flex flex-col items-start p-0 text-left w-full">
                   <div className="mb-4">

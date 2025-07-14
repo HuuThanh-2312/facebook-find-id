@@ -1,5 +1,7 @@
 // API utilities for optimized RapidAPI calls with key rotation
 import { NextResponse } from "next/server"
+import fs from 'fs';
+import path from 'path';
 
 // Simple in-memory cache (for development - use Redis in production)
 const cache = new Map<string, { data: any; timestamp: number }>()
@@ -142,6 +144,58 @@ function getSessionId(request: Request): string {
   return Buffer.from(`${userAgent}${forwardedFor}${realIp}`).toString('base64').slice(0, 16)
 }
 
+const LOG_FILE = path.join(process.cwd(), 'lib', 'api-log.json');
+const LOG_RETENTION_DAYS = 14;
+const LOG_KEEP_DAYS = 7;
+
+interface ApiCallLog {
+  timestamp: number;
+  endpoint: string;
+  link: string;
+  status: number;
+  latency: number;
+}
+
+function readApiCallLogs(): ApiCallLog[] {
+  try {
+    const raw = fs.readFileSync(LOG_FILE, 'utf8');
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+function writeApiCallLogs(logs: ApiCallLog[]) {
+  fs.writeFileSync(LOG_FILE, JSON.stringify(logs, null, 2), 'utf8');
+}
+
+export function logApiCall(log: ApiCallLog) {
+  const logs = readApiCallLogs();
+  logs.push(log);
+  // Xoá log quá 14 ngày
+  const cutoff = Date.now() - LOG_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+  const filtered = logs.filter(l => l.timestamp >= cutoff);
+  writeApiCallLogs(filtered);
+}
+
+export function cleanupApiCallLogsIfNeeded() {
+  // Chỉ cleanup khi là sáng thứ 2
+  const now = new Date();
+  if (now.getDay() === 1 && now.getHours() < 12) {
+    const logs = readApiCallLogs();
+    const cutoff = Date.now() - LOG_KEEP_DAYS * 24 * 60 * 60 * 1000;
+    const filtered = logs.filter(l => l.timestamp >= cutoff);
+    writeApiCallLogs(filtered);
+  }
+}
+
+export function getApiCallLogs(): ApiCallLog[] {
+  cleanupApiCallLogsIfNeeded();
+  // Trả về 7 ngày gần nhất
+  const cutoff = Date.now() - LOG_KEEP_DAYS * 24 * 60 * 60 * 1000;
+  return readApiCallLogs().filter(l => l.timestamp >= cutoff);
+}
+
 export async function optimizedRapidApiCall(
   link: string,
   config: ApiConfig,
@@ -188,9 +242,11 @@ export async function optimizedRapidApiCall(
     signal: controller.signal,
   }
 
+  const start = Date.now();
   try {
     const response = await fetch(url, options)
     clearTimeout(timeoutId)
+    const latency = Date.now() - start;
     
     // Update quota information from response headers
     // Use the correct quota headers: x-ratelimit-requests-*
@@ -247,20 +303,28 @@ export async function optimizedRapidApiCall(
       entries.slice(0, 1000).forEach(([key, value]) => cache.set(key, value))
     }
     
+    logApiCall({
+      timestamp: Date.now(),
+      endpoint: config.endpoint,
+      link,
+      status: response.status,
+      latency
+    });
+    
     return NextResponse.json(data, {
+      status: response.status,
       headers: {
-        'Cache-Control': 'public, max-age=300', // 5 minutes
-        'X-Cache': 'MISS',
-        'X-API-Key-Used': usedKeyIndex.toString(),
-        'X-Remaining-Quota': remaining.toString(),
-        'X-Total-Quota': limit.toString()
+        'X-Api-Latency': latency.toString(),
+        'X-Api-Status': response.status.toString(),
+        'Cache-Control': 'public, max-age=300',
+        'X-Cache': 'MISS'
       }
     })
-  } catch (error) {
+  } catch (e) {
     clearTimeout(timeoutId)
-    console.error("Error fetching data:", error)
+    console.error("Error fetching data:", e)
     
-    if (error instanceof Error && error.name === 'AbortError') {
+    if (e instanceof Error && e.name === 'AbortError') {
       return NextResponse.json({ error: "Request timeout" }, { status: 408 })
     }
     

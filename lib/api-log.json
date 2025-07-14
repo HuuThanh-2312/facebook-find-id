@@ -1,0 +1,198 @@
+[
+  {
+    "timestamp": 1752467565352,
+    "endpoint": "get_facebook_page_id",
+    "link": "https://www.facebook.com/profile.php?id=61576873988961#",
+    "status": 200,
+    "latency": 2725
+  },
+  {
+    "timestamp": 1752468349185,
+    "endpoint": "get_facebook_group_id",
+    "link": "https://www.facebook.com/profile.php?id=61576873988961#",
+    "status": 203,
+    "latency": 2005
+  },
+  {
+    "timestamp": 1752468381663,
+    "endpoint": "get_facebook_page_id",
+    "link": "https://www.facebook.com/profile.php?id=61576873988961#",
+    "status": 200,
+    "latency": 1011
+  },
+  {
+    "timestamp": 1752468773746,
+    "endpoint": "get_facebook_group_id",
+    "link": "https://www.facebook.com/profile.php?id=61576873988961#",
+    "status": 203,
+    "latency": 1034
+  },
+  {
+    "timestamp": 1752473162522,
+    "endpoint": "get_facebook_group_id",
+    "link": "https://www.facebook.com/profile.php?id=61576873988961#",
+    "status": 203,
+    "latency": 970
+  },
+  {
+    "timestamp": 1752473236687,
+    "endpoint": "get_facebook_group_id",
+    "link": "https://www.facebook.com/groups/seedingvn.vn",
+    "status": 200,
+    "latency": 3779
+  },
+  {
+    "timestamp": 1752473246774,
+    "endpoint": "get_facebook_page_id",
+    "link": "https://www.facebook.com/groups/seedingvn.vn",
+    "status": 202,
+    "latency": 1625
+  },
+  {
+    "timestamp": 1752473552955,
+    "endpoint": "get_facebook_page_id",
+    "link": "https://www.facebook.com/groups/seedingvn.vn",
+    "status": 202,
+    "latency": 2108
+  },
+  {
+    "timestamp": 1752473736907,
+    "endpoint": "get_facebook_page_id",
+    "link": "https://www.facebook.com/groups/seedingvn.vn",
+    "status": 202,
+    "latency": 842
+  },
+  {
+    "timestamp": 1752474240543,
+    "endpoint": "get_facebook_page_id",
+    "link": "https://www.facebook.com/groups/seedingvn.vn",
+    "status": 202,
+    "latency": 917
+  },
+  {
+    "timestamp": 1752474586635,
+    "endpoint": "get_facebook_page_id",
+    "link": "https://www.facebook.com/groups/seedingvn.vn",
+    "status": 202,
+    "latency": 1190
+  },
+  {
+    "timestamp": 1752474741785,
+    "endpoint": "get_facebook_post_id",
+    "link": "https://www.facebook.com/groups/seedingvn.vn",
+    "status": 200,
+    "latency": 4778
+  },
+  {
+    "timestamp": 1752474754624,
+    "endpoint": "get_facebook_group_id",
+    "link": "https://www.facebook.com/groups/seedingvn.vn",
+    "status": 200,
+    "latency": 2532
+  },
+  {
+    "timestamp": 1752474763737,
+    "endpoint": "get_facebook_group_id",
+    "link": "https://www.facebook.com/aaa/seedingvn.vn",
+    "status": 203,
+    "latency": 893
+  },
+  {
+    "timestamp": 1752475823341,
+    "endpoint": "get_facebook_page_id",
+    "link": "sadadasda",
+    "status": 202,
+    "latency": 1326
+  },
+  {
+    "timestamp": 1752475931133,
+    "endpoint": "get_facebook_page_id",
+    "link": "sadasdasd",
+    "status": 202,
+    "latency": 761
+  },
+  {
+    "timestamp": 1752476346591,
+    "endpoint": "get_facebook_page_id",
+    "link": "sadasdasdjiaposd",
+    "status": 202,
+    "latency": 1098
+  },
+  {
+    "timestamp": 1752476392518,
+    "endpoint": "get_facebook_group_id",
+    "link": "dkfaosidjaosd",
+    "status": 202,
+    "latency": 1092
+  },
+  {
+    "timestamp": 1752476416102,
+    "endpoint": "get_facebook_group_id",
+    "link": "https://www.facebook.com/groups/seedingvn.vn",
+    "status": 200,
+    "latency": 1711
+  },
+  {
+    "timestamp": 1752476434886,
+    "endpoint": "get_facebook_post_id",
+    "link": "https://www.facebook.com/groups/seedingvn.vn/posts/528637626942888/",
+    "status": 200,
+    "latency": 1555
+  },
+  {
+    "timestamp": 1752476446947,
+    "endpoint": "get_facebook_page_id",
+    "link": "https://www.facebook.com/seedingvn",
+    "status": 200,
+    "latency": 823
+  },
+  {
+    "timestamp": 1752476455068,
+    "endpoint": "get_facebook_page_id",
+    "link": "100080641171789",
+    "status": 202,
+    "latency": 1988
+  },
+  {
+    "timestamp": 1752476481655,
+    "endpoint": "get_facebook_page_id",
+    "link": "https://www.facebook.com/ChelseaFCVietnam",
+    "status": 200,
+    "latency": 4159
+  },
+  {
+    "timestamp": 1752476518742,
+    "endpoint": "get_facebook_post_id",
+    "link": "https://www.facebook.com/ChelseaFCVietnam/posts/pfbid0VHw1FwkuKgGtvYZr2nq8PDwimgZxtmJzDK9K7qR2qjFtYNPw7fBevkURpapMWV2Ml",
+    "status": 200,
+    "latency": 6262
+  },
+  {
+    "timestamp": 1752476529607,
+    "endpoint": "get_facebook_group_id",
+    "link": "https://www.facebook.com/ChelseaFCVietnam#",
+    "status": 203,
+    "latency": 780
+  },
+  {
+    "timestamp": 1752476554213,
+    "endpoint": "get_facebook_group_id",
+    "link": "103420082797980",
+    "status": 202,
+    "latency": 794
+  },
+  {
+    "timestamp": 1752476787827,
+    "endpoint": "get_facebook_group_id",
+    "link": "https://www.facebook.com/groups/seedingvn.vn",
+    "status": 200,
+    "latency": 2246
+  },
+  {
+    "timestamp": 1752476819399,
+    "endpoint": "get_facebook_post_id",
+    "link": "https://www.facebook.com/ChelseaFCVietnam/posts/pfbid0VHw1FwkuKgGtvYZr2nq8PDwimgZxtmJzDK9K7qR2qjFtYNPw7fBevkURpapMWV2Ml",
+    "status": 200,
+    "latency": 686
+  }
+]
