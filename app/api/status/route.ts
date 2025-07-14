@@ -2,6 +2,12 @@ import { NextResponse } from "next/server"
 import { getApiKeyStatus, getApiCallLogs } from "@/lib/api-utils"
 import fs from 'fs';
 import path from 'path';
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabase = SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) : null;
+const isServerless = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
 
 export async function GET() {
   try {
@@ -11,6 +17,23 @@ export async function GET() {
     const totalLimit = status.reduce((sum, key) => sum + key.limit, 0)
     const activeKeys = status.filter(key => key.isActive).length
     
+    let logs = [];
+    if (isServerless && supabase) {
+      // Lấy log từ Supabase, mới nhất trước
+      const { data, error } = await supabase
+        .from('api_logs')
+        .select('*')
+        .order('timestamp', { ascending: false })
+        .limit(1000);
+      if (error) {
+        console.error('Supabase fetch log error:', error);
+      } else if (data) {
+        logs = data;
+      }
+    } else {
+      logs = getApiCallLogs();
+    }
+
     return NextResponse.json({
       keys: status,
       summary: {
@@ -21,7 +44,7 @@ export async function GET() {
         usagePercentage: totalLimit > 0 ? ((totalLimit - totalRemaining) / totalLimit * 100).toFixed(2) : '0'
       },
       timestamp: new Date().toISOString(),
-      logs: getApiCallLogs()
+      logs
     })
   } catch (error: any) {
     // Nếu lỗi do file log không tồn tại, tự động tạo file log rỗng và thử lại 1 lần

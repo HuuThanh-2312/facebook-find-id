@@ -2,6 +2,13 @@
 import { NextResponse } from "next/server"
 import fs from 'fs';
 import path from 'path';
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabase = SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) : null;
+
+const isServerless = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
 
 // Simple in-memory cache (for development - use Redis in production)
 const cache = new Map<string, { data: any; timestamp: number }>()
@@ -146,7 +153,25 @@ function writeApiCallLogs(logs: ApiCallLog[]) {
   fs.writeFileSync(LOG_FILE, JSON.stringify(logs, null, 2), 'utf8');
 }
 
-export function logApiCall(log: ApiCallLog) {
+export async function logApiCall(log: ApiCallLog) {
+  if (isServerless && supabase) {
+    // Ghi log vào Supabase
+    try {
+      await supabase.from('api_logs').insert([
+        {
+          timestamp: new Date(log.timestamp).toISOString(),
+          endpoint: log.endpoint,
+          link: log.link,
+          status: log.status,
+          latency: log.latency
+        }
+      ]);
+    } catch (e) {
+      console.error('Supabase log error:', e);
+    }
+    return;
+  }
+  // Local/dev: ghi file như cũ
   const logs = readApiCallLogs();
   logs.push(log);
   // Xoá log quá 14 ngày
