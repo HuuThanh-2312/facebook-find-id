@@ -49,9 +49,10 @@ const API_KEYS: ApiKeyInfo[] = [
   }
 ].filter(keyInfo => keyInfo.key && keyInfo.key !== '')
 
-// Session-based key rotation
-const sessionKeys = new Map<string, number>()
-let currentKeyIndex = 0
+// Thời gian đổi key (ms)
+const KEY_ROTATION_INTERVAL = 5 * 60 * 1000; // 5 phút
+let currentKeyIndex: number | null = null;
+let lastKeyRotation = 0;
 
 // Initialize quota from environment or set defaults
 function initializeQuota() {
@@ -68,53 +69,29 @@ function initializeQuota() {
 // Initialize quota on module load
 initializeQuota()
 
-function getNextAvailableKey(sessionId?: string): ApiKeyInfo | null {
-  // If session has a key assigned, try to use it first
-  if (sessionId && sessionKeys.has(sessionId)) {
-    const sessionKeyIndex = sessionKeys.get(sessionId)!
-    const sessionKey = API_KEYS[sessionKeyIndex]
-    
-    if (sessionKey && sessionKey.isActive && sessionKey.remaining > 0) {
-      return sessionKey
-    }
+function getNextAvailableKey(): ApiKeyInfo | null {
+  const now = Date.now();
+  // Lọc ra các key còn quota
+  const availableKeys = API_KEYS
+    .map((key, idx) => ({ ...key, idx }))
+    .filter(k => k.isActive && k.remaining > 0);
+
+  if (availableKeys.length === 0) return null;
+
+  // Nếu chưa chọn key hoặc đã quá 5 phút hoặc key hiện tại hết quota, chọn lại ngẫu nhiên
+  if (
+    currentKeyIndex === null ||
+    now - lastKeyRotation > KEY_ROTATION_INTERVAL ||
+    !API_KEYS[currentKeyIndex] ||
+    !API_KEYS[currentKeyIndex].isActive ||
+    API_KEYS[currentKeyIndex].remaining <= 0
+  ) {
+    const randomIdx = Math.floor(Math.random() * availableKeys.length);
+    currentKeyIndex = availableKeys[randomIdx].idx;
+    lastKeyRotation = now;
   }
 
-  // Find the best available key
-  let bestKey: ApiKeyInfo | null = null
-  let maxRemaining = -1
-
-  for (let i = 0; i < API_KEYS.length; i++) {
-    const key = API_KEYS[i]
-    if (key.isActive && key.remaining > 0) {
-      if (key.remaining > maxRemaining) {
-        maxRemaining = key.remaining
-        bestKey = key
-        currentKeyIndex = i
-      }
-    }
-  }
-
-  // If no key with remaining quota, try to find one that's reset
-  if (!bestKey) {
-    const now = Date.now()
-    for (let i = 0; i < API_KEYS.length; i++) {
-      const key = API_KEYS[i]
-      if (key.isActive && now >= key.resetTime) {
-        key.remaining = key.limit
-        key.resetTime = 0
-        bestKey = key
-        currentKeyIndex = i
-        break
-      }
-    }
-  }
-
-  // Assign key to session if found
-  if (bestKey && sessionId) {
-    sessionKeys.set(sessionId, currentKeyIndex)
-  }
-
-  return bestKey
+  return API_KEYS[currentKeyIndex] || null;
 }
 
 function updateKeyQuota(keyIndex: number, remaining: number, limit: number, resetTime: number) {
@@ -213,11 +190,8 @@ export async function optimizedRapidApiCall(
     })
   }
 
-  // Get session ID for key rotation
-  const sessionId = getSessionId(request)
-  
   // Get available API key
-  const keyInfo = getNextAvailableKey(sessionId)
+  const keyInfo = getNextAvailableKey()
   if (!keyInfo) {
     console.error("No available API keys with remaining quota")
     return NextResponse.json({ 

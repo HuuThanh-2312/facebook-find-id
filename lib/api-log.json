@@ -194,5 +194,145 @@
     "link": "https://www.facebook.com/ChelseaFCVietnam/posts/pfbid0VHw1FwkuKgGtvYZr2nq8PDwimgZxtmJzDK9K7qR2qjFtYNPw7fBevkURpapMWV2Ml",
     "status": 200,
     "latency": 686
+  },
+  {
+    "timestamp": 1752477532114,
+    "endpoint": "get_facebook_page_id",
+    "link": "https://www.facebook.com/seedingvn",
+    "status": 200,
+    "latency": 1003
+  },
+  {
+    "timestamp": 1752478335583,
+    "endpoint": "get_facebook_post_id",
+    "link": "https://www.facebook.com/seedingvn/posts/pfbid0n6Jce9W8EmCzVuNUi3y88vw9urrp24o13JeYtZR75zLMkrhUExU435XwNs5iNyNTl",
+    "status": 200,
+    "latency": 1260
+  },
+  {
+    "timestamp": 1752478888557,
+    "endpoint": "get_facebook_page_id",
+    "link": "sadasd",
+    "status": 202,
+    "latency": 988
+  },
+  {
+    "timestamp": 1752479168247,
+    "endpoint": "get_facebook_post_id",
+    "link": "sadasd",
+    "status": 202,
+    "latency": 1063
+  },
+  {
+    "timestamp": 1752479179085,
+    "endpoint": "get_facebook_post_id",
+    "link": "sadsad",
+    "status": 202,
+    "latency": 1013
+  },
+  {
+    "timestamp": 1752479377560,
+    "endpoint": "get_facebook_group_id",
+    "link": "sadasd",
+    "status": 202,
+    "latency": 1522
+  },
+  {
+    "timestamp": 1752479505470,
+    "endpoint": "get_facebook_page_id",
+    "link": "sadasd",
+    "status": 202,
+    "latency": 1681
+  },
+  {
+    "timestamp": 1752479511484,
+    "endpoint": "get_facebook_post_id",
+    "link": "sad",
+    "status": 202,
+    "latency": 873
+  },
+  {
+    "timestamp": 1752479517153,
+    "endpoint": "get_facebook_group_id",
+    "link": "đá",
+    "status": 202,
+    "latency": 1011
+  },
+  {
+    "timestamp": 1752479523736,
+    "endpoint": "get_facebook_group_id",
+    "link": "ádasd",
+    "status": 202,
+    "latency": 773
+  },
+  {
+    "timestamp": 1752479529686,
+    "endpoint": "get_facebook_post_id",
+    "link": "ádasd",
+    "status": 202,
+    "latency": 1238
+  },
+  {
+    "timestamp": 1752479537330,
+    "endpoint": "get_facebook_page_id",
+    "link": "ádasd",
+    "status": 202,
+    "latency": 967
+  },
+  {
+    "timestamp": 1752479708262,
+    "endpoint": "get_facebook_page_id",
+    "link": "ssad",
+    "status": 202,
+    "latency": 952
+  },
+  {
+    "timestamp": 1752479903431,
+    "endpoint": "get_facebook_group_id",
+    "link": "sadsad",
+    "status": 202,
+    "latency": 1140
+  },
+  {
+    "timestamp": 1752480101735,
+    "endpoint": "get_facebook_page_id",
+    "link": "sadasd",
+    "status": 202,
+    "latency": 1229
+  },
+  {
+    "timestamp": 1752480123095,
+    "endpoint": "get_facebook_post_id",
+    "link": "dsadasd",
+    "status": 202,
+    "latency": 1234
+  },
+  {
+    "timestamp": 1752480139079,
+    "endpoint": "get_facebook_post_id",
+    "link": "đâsd",
+    "status": 202,
+    "latency": 979
+  },
+  {
+    "timestamp": 1752480175495,
+    "endpoint": "get_facebook_post_id",
+    "link": "sadasd",
+    "status": 202,
+    "latency": 1050
+  },
+  {
+    "timestamp": 1752480342154,
+    "endpoint": "get_facebook_group_id",
+    "link": "sadasd",
+    "status": 202,
+    "latency": 963
+  },
+  {
+    "timestamp": 1752480347815,
+    "endpoint": "get_facebook_group_id",
+    "link": "ádasd",
+    "status": 202,
+    "latency": 1041
   }
 ]

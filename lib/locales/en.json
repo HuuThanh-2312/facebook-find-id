@@ -55,7 +55,8 @@
     "footerSection4Link1": "Cookie policy",
     "footerSection4Link2": "Privacy policy",
     "footerSection4Link3": "Terms of service",
-    "notFoundId": "ID not found. Please check the URL or try again in a few minutes."
+    "notFoundId": "ID not found. Please check the URL or try again in a few minutes.",
+    "pleaseEnterUrl": "Please enter a URL"
   },
   "homePage": {
     "title": "Facebook ID Finder - Free Lookup Tools | Seedingvn.vn",

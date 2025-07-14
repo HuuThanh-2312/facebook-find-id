@@ -46,6 +46,8 @@ export function ApiStatus() {
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [logPage, setLogPage] = useState(1);
+  const LOGS_PER_PAGE = 10;
 
   const fetchStatus = async () => {
     try {
@@ -95,6 +97,11 @@ export function ApiStatus() {
       errorRate: v.count ? Math.round((v.error/v.count)*100) : 0
     }))
   }, [logs])
+
+  // Phân trang log
+  const sortedLogs = [...logs].sort((a, b) => b.timestamp - a.timestamp);
+  const totalLogPages = Math.ceil(sortedLogs.length / LOGS_PER_PAGE);
+  const paginatedLogs = sortedLogs.slice((logPage - 1) * LOGS_PER_PAGE, logPage * LOGS_PER_PAGE);
 
   if (loading) {
     return (
@@ -235,6 +242,12 @@ export function ApiStatus() {
         {/* Log Table */}
         <div className="mt-8">
           <div className="text-sm font-semibold mb-2">API Call Log (7 days)</div>
+          {/* Pagination controls */}
+          <div className="flex justify-end items-center mb-2 gap-2">
+            <Button size="sm" variant="outline" onClick={() => setLogPage(p => Math.max(1, p - 1))} disabled={logPage === 1}>Previous</Button>
+            <span className="text-xs">Page {logPage} / {totalLogPages || 1}</span>
+            <Button size="sm" variant="outline" onClick={() => setLogPage(p => Math.min(totalLogPages, p + 1))} disabled={logPage === totalLogPages || totalLogPages === 0}>Next</Button>
+          </div>
           <div className="overflow-x-auto">
             <table className="min-w-full text-xs border">
               <thead>
@@ -248,28 +261,29 @@ export function ApiStatus() {
                 </tr>
               </thead>
               <tbody>
-                {logs.length === 0 ? (
-                  <tr><td colSpan={6} className="text-center text-gray-400 py-2">No log</td></tr>
-                ) : (
-                  logs.slice(-100).reverse().map((log, i) => (
-                    <tr key={i} className="border-b hover:bg-gray-50">
-                      <td className="px-2 py-1 border whitespace-nowrap">{new Date(log.timestamp).toLocaleString()}</td>
-                      <td className="px-2 py-1 border">{log.endpoint}</td>
-                      <td className="px-2 py-1 border text-center">{log.status}</td>
-                      <td className="px-2 py-1 border text-center">{typeof log.latency === 'number' ? log.latency.toLocaleString(undefined, { maximumFractionDigits: 2 }) : ''}</td>
-                      <td className="px-2 py-1 border max-w-xs truncate" title={log.link}>{log.link.length > 40 ? log.link.slice(0, 37) + '...' : log.link}</td>
-                      <td className="px-2 py-1 border text-center">
-                        <Button size="icon" variant="ghost" onClick={() => {
+                {paginatedLogs.map((log, idx) => (
+                  <tr key={log.timestamp + '-' + idx}>
+                    <td className="px-2 py-1 border whitespace-nowrap">{new Date(log.timestamp).toLocaleString()}</td>
+                    <td className="px-2 py-1 border">{log.endpoint}</td>
+                    <td className="px-2 py-1 border text-center">{log.status}</td>
+                    <td className="px-2 py-1 border text-center">{log.latency}</td>
+                    <td className="px-2 py-1 border max-w-xs truncate" title={log.link}>{log.link}</td>
+                    <td className="px-2 py-1 border text-center">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => {
                           navigator.clipboard.writeText(log.link)
-                          setCopiedIdx(i)
-                          setTimeout(() => setCopiedIdx(null), 1500)
-                        }} title="Copy link">
-                          {copiedIdx === i ? <CheckIcon className="w-4 h-4 text-green-600" /> : <CopyIcon className="w-4 h-4" />}
-                        </Button>
-                      </td>
-                    </tr>
-                  ))
-                )}
+                          setCopiedIdx(idx)
+                          setTimeout(() => setCopiedIdx(null), 1200)
+                        }}
+                        aria-label="Copy link"
+                      >
+                        {copiedIdx === idx ? <CheckIcon className="h-4 w-4 text-green-600" /> : <CopyIcon className="h-4 w-4" />}
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

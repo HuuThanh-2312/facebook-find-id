@@ -55,7 +55,8 @@
     "footerSection4Link1": "Chính sách Cookie",
     "footerSection4Link2": "Chính sách bảo mật",
     "footerSection4Link3": "Điều khoản dịch vụ",
-    "notFoundId": "Không tìm thấy ID. Vui lòng kiểm tra URL hoặc thử lại trong ít phút"
+    "notFoundId": "Không tìm thấy ID. Vui lòng kiểm tra URL hoặc thử lại trong ít phút",
+    "pleaseEnterUrl": "Vui lòng nhập URL"
   },
   "homePage": {
     "title": "Công Cụ Tìm ID Facebook Nhanh, Miễn Phí & Chính Xác | Seedingvn.vn",

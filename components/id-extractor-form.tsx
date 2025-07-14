@@ -98,6 +98,12 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
     setBatchResults([])
 
     if (extractionMode === "single") {
+      if (!urlInput) {
+        setMessage(tString("common.pleaseEnterUrl"))
+        setMessageType("error")
+        setIsLoading(false);
+        return;
+      }
       const { id, extractionStatus, message: msg = "", status, latency } = await performExtraction(urlInput)
       idResultForEvent = id || null;
       statusForEvent = status;
@@ -121,6 +127,7 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
       if (urls.length === 0) {
         setMessage(tString("common.enterUrlsPlaceholder"))
         setMessageType("error")
+        setIsLoading(false);
         return
       }
 
@@ -145,7 +152,8 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
       latencyForEvent = results[0]?.apiLatency;
     }
 
-    if (typeof window !== 'undefined') {
+    // Chỉ bắn event khi có URL (sau khi đã validate ở trên)
+    if (typeof window !== 'undefined' && urlForEvent && urlForEvent.trim().length > 0) {
       (window as any).dataLayer = (window as any).dataLayer || [];
       (window as any).dataLayer.push({ event: 'extract_id_click', extractionMode, type, url: urlForEvent, idresult: idResultForEvent, apiStatus: statusForEvent, apiLatency: latencyForEvent });
     }
@@ -204,6 +212,15 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
     }
   }
 
+  // Reset message khi chuyển tab
+  const handleModeChange = (mode: "single" | "batch") => {
+    setExtractionMode(mode);
+    setMessage(null);
+    setMessageType(null);
+    setExtractedId(null);
+    setBatchResults([]);
+  };
+
   // Fix for t() possibly returning string[]
   function tString(key: string): string {
     const val = t(key)
@@ -217,14 +234,14 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
         <div className="flex justify-center mb-4 gap-x-2">
           <Button
             variant={extractionMode === "single" ? "outline" : "outline"}
-            onClick={() => setExtractionMode("single")}
+            onClick={() => handleModeChange("single")}
             className={`w-1/2 text-sm md:text-base text-wrap h-auto py-2 border-2 ${extractionMode === "single" ? "border-primary font-semibold text-primary" : "border-border text-muted-foreground"} bg-white shadow-none`}
           >
             {tString("common.singleUrlExtraction")}
           </Button>
           <Button
             variant={extractionMode === "batch" ? "outline" : "outline"}
-            onClick={() => setExtractionMode("batch")}
+            onClick={() => handleModeChange("batch")}
             className={`w-1/2 text-sm md:text-base text-wrap h-auto py-2 border-2 ${extractionMode === "batch" ? "border-primary font-semibold text-primary" : "border-border text-muted-foreground"} bg-white shadow-none`}
           >
             {tString("common.batchUrlExtraction")}
@@ -233,20 +250,34 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
 
         {/* Input Area based on mode */}
         {extractionMode === "single" ? (
-          <Input
-            placeholder={tString("common.enterUrlPlaceholder")}
-            value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
-            className="w-full p-2 text-xs md:text-sm rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-          />
+          <>
+            <Input
+              placeholder={tString("common.enterUrlPlaceholder")}
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              className="w-full p-2 text-xs md:text-sm rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+            />
+            {(message && messageType === "error") && (
+              <div className="text-xs text-red-600 mt-1 ml-1 animate-fade-in">
+                {message}
+              </div>
+            )}
+          </>
         ) : (
-          <Textarea
-            placeholder={tString("common.enterUrlsPlaceholder")}
-            value={urlsInputBatch}
-            onChange={(e) => setUrlsInputBatch(e.target.value)}
-            rows={8}
-            className="w-full p-2 text-xs md:text-sm max-h-32 resize-y rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-          />
+          <>
+            <Textarea
+              placeholder={tString("common.enterUrlsPlaceholder")}
+              value={urlsInputBatch}
+              onChange={(e) => setUrlsInputBatch(e.target.value)}
+              rows={8}
+              className="w-full p-2 text-xs md:text-sm max-h-32 resize-y rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+            />
+            {(message && messageType === "error") && (
+              <div className="text-xs text-red-600 mt-1 ml-1 animate-fade-in">
+                {message}
+              </div>
+            )}
+          </>
         )}
 
         <Button
@@ -265,7 +296,7 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
         </Button>
 
         {/* Display results for single mode (unified format) */}
-        {extractionMode === "single" && extractedId !== null && (
+        {extractionMode === "single" && extractedId !== null && messageType !== 'error' && (
           <>
             <div className="border p-2 rounded-md bg-muted/20">
               <div className="flex items-center space-x-2">
@@ -283,11 +314,6 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
                 </Button>
               </div>
             </div>
-            {(message && messageType) && (
-              <div className={`mt-2 text-sm ${messageType === 'error' ? 'text-red-600' : messageType === 'info' ? 'text-gray-600' : ''}`}>
-                {message}
-              </div>
-            )}
             <Button
               onClick={() => extractedId && handleCopyToClipboard(extractedId)}
               className="w-full h-9 text-xs md:text-sm bg-secondary text-secondary-foreground hover:bg-secondary/90 mt-2"
@@ -304,38 +330,47 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
           <div className="space-y-4">
             <div className="flex flex-col space-y-4">
               {batchResults.map((result, index) => (
-                <div key={index} className="border p-4 rounded-md bg-muted/20">
-                  {/* Removed URL display */}
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xl md:text-2xl font-bold text-foreground flex-1 break-all">
-                      {result.id || "N/A"}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => result.id && handleCopyToClipboard(result.id, index)}
-                      aria-label={tString("common.copyToClipboard")}
-                      disabled={!result.id}
-                      className="h-9 w-9 rounded-md hover:bg-accent bg-transparent"
-                    >
-                      {result.copyFeedback ? (
-                        <CheckIcon className="h-5 w-5 text-primary" />
-                      ) : (
-                        <CopyIcon className="h-5 w-5" />
-                      )}
-                      <span className="sr-only">{tString("common.copyToClipboard")}</span>
-                    </Button>
+                result.extractionStatus !== 'error' && result.id && result.id !== 'N/A' ? (
+                  <div key={index} className="border p-4 rounded-md bg-muted/20">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xl md:text-2xl font-bold text-foreground flex-1 break-all">
+                        {result.id}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => result.id && handleCopyToClipboard(result.id, index)}
+                        aria-label={tString("common.copyToClipboard")}
+                        disabled={!result.id}
+                        className="h-9 w-9 rounded-md hover:bg-accent bg-transparent"
+                      >
+                        {result.copyFeedback ? (
+                          <CheckIcon className="h-5 w-5 text-primary" />
+                        ) : (
+                          <CopyIcon className="h-5 w-5" />
+                        )}
+                        <span className="sr-only">{tString("common.copyToClipboard")}</span>
+                      </Button>
+                    </div>
                   </div>
-                  {/* Removed message display */}
-                </div>
+                ) : (
+                  <div key={index} className="border p-4 rounded-md bg-muted/20">
+                    <div className="text-xs text-red-600 mt-1 ml-1 animate-fade-in">
+                      {result.message}
+                    </div>
+                  </div>
+                )
               ))}
             </div>
-            <Button
-              onClick={handleCopyAllResults}
-              className="w-full h-10 text-sm md:text-base bg-secondary text-secondary-foreground hover:bg-secondary/90"
-            >
-              {batchCopyFeedback ? <CheckIcon className="h-5 w-5 text-primary mx-auto" /> : tString("common.copyAllResults")}
-            </Button>
+            {/* Chỉ hiển thị nút Copy All nếu có ít nhất 1 ID hợp lệ */}
+            {batchResults.some(r => r.extractionStatus !== 'error' && r.id && r.id !== 'N/A') && (
+              <Button
+                onClick={handleCopyAllResults}
+                className="w-full h-10 text-sm md:text-base bg-secondary text-secondary-foreground hover:bg-secondary/90"
+              >
+                {batchCopyFeedback ? <CheckIcon className="h-5 w-5 text-primary mx-auto" /> : tString("common.copyAllResults")}
+              </Button>
+            )}
           </div>
         )}
       </CardContent>
