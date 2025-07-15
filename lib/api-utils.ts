@@ -31,14 +31,6 @@ interface ApiKeyInfo {
 // API Keys configuration - Monthly quota (200 requests per month)
 const API_KEYS: ApiKeyInfo[] = [
   {
-    key: 'c920e5d0demsh98727e9df4e0e0fp1e7e04jsn96ea9ac03340',
-    remaining: 0, // Will be updated from Supabase
-    quota_limit: 200,
-    resetTime: 0,
-    lastUsed: 0,
-    isActive: true
-  },
-  {
     key: 'f0da5a91b0msha42bb6cc03b3d9fp12e539jsn04b059f7f323',
     remaining: 0, // Will be updated from Supabase
     quota_limit: 200,
@@ -134,7 +126,8 @@ function getNextAvailableKey(): ApiKeyInfo | null {
   return API_KEYS[currentKeyIndex] || null;
 }
 
-function updateKeyQuota(keyIndex: number, remaining: number, quota_limit: number, resetTime: number) {
+// Sửa hàm updateKeyQuota thành async và luôn await khi upsert quota lên Supabase
+async function updateKeyQuota(keyIndex: number, remaining: number, quota_limit: number, resetTime: number) {
   if (keyIndex >= 0 && keyIndex < API_KEYS.length) {
     API_KEYS[keyIndex].remaining = remaining;
     API_KEYS[keyIndex].quota_limit = quota_limit;
@@ -142,7 +135,7 @@ function updateKeyQuota(keyIndex: number, remaining: number, quota_limit: number
     API_KEYS[keyIndex].lastUsed = Date.now();
     // Đồng bộ lên Supabase
     if (supabase) {
-      supabase.from('api_key_status').upsert({
+      await supabase.from('api_key_status').upsert({
         key: API_KEYS[keyIndex].key,
         remaining,
         quota_limit,
@@ -303,7 +296,7 @@ export async function optimizedRapidApiCall(
     // Find the key index that was used
     const usedKeyIndex = API_KEYS.findIndex(k => k.key === keyInfo.key)
     if (usedKeyIndex >= 0) {
-      updateKeyQuota(usedKeyIndex, remaining, quota_limit, resetTime)
+      await updateKeyQuota(usedKeyIndex, remaining, quota_limit, resetTime)
       // Log quota update for debugging
       console.log(`API Key ${usedKeyIndex}: Updated quota - ${remaining}/${quota_limit}, Reset: ${new Date(resetTime).toLocaleString()}`)
     }
@@ -375,8 +368,23 @@ export async function optimizedRapidApiCall(
   }
 }
 
-// Utility function to get API key status (for monitoring)
-export function getApiKeyStatus() {
+// Sửa getApiKeyStatus thành async, luôn đọc lại quota từ Supabase trước khi trả về
+export async function getApiKeyStatus() {
+  if (supabase) {
+    const { data, error } = await supabase.from('api_key_status').select('*');
+    if (!error && data && data.length > 0) {
+      API_KEYS.forEach((key, idx) => {
+        const found = data.find((row: any) => row.key === key.key);
+        if (found) {
+          key.remaining = found.remaining;
+          key.quota_limit = found.quota_limit;
+          key.resetTime = found.reset_time || 0;
+          key.lastUsed = found.last_used || 0;
+          key.isActive = found.is_active !== false;
+        }
+      });
+    }
+  }
   return API_KEYS.map((key, index) => ({
     index,
     remaining: key.remaining,
