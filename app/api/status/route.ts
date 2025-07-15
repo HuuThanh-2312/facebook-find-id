@@ -11,7 +11,7 @@ const isServerless = process.env.VERCEL === '1' || process.env.NODE_ENV === 'pro
 
 export async function GET() {
   try {
-    const status = getApiKeyStatus()
+    const status = await getApiKeyStatus()
     
     const totalRemaining = status.reduce((sum, key) => sum + key.remaining, 0)
     const totalLimit = status.reduce((sum, key) => sum + key.limit, 0)
@@ -53,7 +53,7 @@ export async function GET() {
         const logPath = path.join(process.cwd(), 'lib', 'api-log.json');
         fs.writeFileSync(logPath, '[]', 'utf8');
         // Thử lại trả về status sau khi tạo file log
-        const status = getApiKeyStatus()
+        const status = await getApiKeyStatus()
         const totalRemaining = status.reduce((sum, key) => sum + key.remaining, 0)
         const totalLimit = status.reduce((sum, key) => sum + key.limit, 0)
         const activeKeys = status.filter(key => key.isActive).length
