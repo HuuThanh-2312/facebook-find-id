@@ -31,7 +31,7 @@ interface ApiKeyInfo {
 // API Keys configuration - Monthly quota (200 requests per month)
 const API_KEYS: ApiKeyInfo[] = [
   {
-    key: process.env.RAPIDAPI_KEY_1 || 'c920e5d0demsh98727e9df4e0e0fp1e7e04jsn96ea9ac03340',
+    key: 'c920e5d0demsh98727e9df4e0e0fp1e7e04jsn96ea9ac03340',
     remaining: 0, // Will be updated from Supabase
     quota_limit: 200,
     resetTime: 0,
@@ -39,15 +39,7 @@ const API_KEYS: ApiKeyInfo[] = [
     isActive: true
   },
   {
-    key: process.env.RAPIDAPI_KEY_2 || '0bb981d8f9msh1e036e36ddd3357p152060jsn67d329eda94c',
-    remaining: 0, // Will be updated from Supabase
-    quota_limit: 200,
-    resetTime: 0,
-    lastUsed: 0,
-    isActive: true
-  },
-  {
-    key: process.env.RAPIDAPI_KEY_3 || '55db04b790msh510f2533ff159ecp192b82jsnacb1ccde8dbf',
+    key: 'f0da5a91b0msha42bb6cc03b3d9fp12e539jsn04b059f7f323',
     remaining: 0, // Will be updated from Supabase
     quota_limit: 200,
     resetTime: 0,
