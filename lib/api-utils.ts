@@ -22,7 +22,7 @@ interface ApiConfig {
 interface ApiKeyInfo {
   key: string
   remaining: number
-  limit: number
+  quota_limit: number
   resetTime: number
   lastUsed: number
   isActive: boolean
@@ -32,24 +32,24 @@ interface ApiKeyInfo {
 const API_KEYS: ApiKeyInfo[] = [
   {
     key: process.env.RAPIDAPI_KEY_1 || 'c920e5d0demsh98727e9df4e0e0fp1e7e04jsn96ea9ac03340',
-    remaining: 0, // Will be updated from response headers
-    limit: 200,
+    remaining: 0, // Will be updated from Supabase
+    quota_limit: 200,
     resetTime: 0,
     lastUsed: 0,
     isActive: true
   },
   {
     key: process.env.RAPIDAPI_KEY_2 || '0bb981d8f9msh1e036e36ddd3357p152060jsn67d329eda94c',
-    remaining: 0, // Will be updated from response headers
-    limit: 200,
+    remaining: 0, // Will be updated from Supabase
+    quota_limit: 200,
     resetTime: 0,
     lastUsed: 0,
     isActive: true
   },
   {
     key: process.env.RAPIDAPI_KEY_3 || '55db04b790msh510f2533ff159ecp192b82jsnacb1ccde8dbf',
-    remaining: 0, // Will be updated from response headers
-    limit: 200,
+    remaining: 0, // Will be updated from Supabase
+    quota_limit: 200,
     resetTime: 0,
     lastUsed: 0,
     isActive: true
@@ -61,14 +61,55 @@ const KEY_ROTATION_INTERVAL = 5 * 60 * 1000; // 5 phút
 let currentKeyIndex: number | null = null;
 let lastKeyRotation = 0;
 
-// Initialize quota from environment or set defaults
+// Đọc trạng thái quota từ Supabase khi khởi động
+async function syncQuotaFromSupabase() {
+  if (!supabase) return;
+  const { data, error } = await supabase.from('api_key_status').select('*');
+  if (error) {
+    console.error('Supabase quota fetch error:', error);
+    return;
+  }
+  if (data && data.length > 0) {
+    // Đồng bộ lại trạng thái quota cho từng key
+    API_KEYS.forEach((key, idx) => {
+      const found = data.find((row: any) => row.key === key.key);
+      if (found) {
+        key.remaining = found.remaining;
+        key.quota_limit = found.quota_limit;
+        key.resetTime = found.reset_time || 0;
+        key.lastUsed = found.last_used || 0;
+        key.isActive = found.is_active !== false;
+      }
+    });
+  } else {
+    // Nếu chưa có dữ liệu, insert các key mới
+    for (const key of API_KEYS) {
+      await supabase.from('api_key_status').insert([
+        {
+          key: key.key,
+          remaining: key.remaining || key.quota_limit,
+          quota_limit: key.quota_limit,
+          reset_time: key.resetTime,
+          last_used: key.lastUsed,
+          is_active: key.isActive
+        }
+      ]);
+    }
+  }
+}
+
+// Gọi hàm sync khi khởi động
+if (supabase) {
+  syncQuotaFromSupabase();
+}
+
+// Initialize quota from Supabase or set defaults
 function initializeQuota() {
-  // Set default quota for keys that haven't been used yet
+  // Nếu không dùng Supabase thì fallback về RAM
   API_KEYS.forEach((key, index) => {
     if (key.remaining === 0) {
-      // Set a reasonable default, will be updated on first API call
-      key.remaining = key.limit
-      console.log(`Initialized API Key ${index} with default quota: ${key.remaining}/${key.limit}`)
+      key.remaining = key.quota_limit;
+      console.log(`Initialized API Key ${index} with default quota: ${key.remaining}/${key.quota_limit}`)
     }
   })
 }
@@ -101,12 +142,23 @@ function getNextAvailableKey(): ApiKeyInfo | null {
   return API_KEYS[currentKeyIndex] || null;
 }
 
-function updateKeyQuota(keyIndex: number, remaining: number, limit: number, resetTime: number) {
+function updateKeyQuota(keyIndex: number, remaining: number, quota_limit: number, resetTime: number) {
   if (keyIndex >= 0 && keyIndex < API_KEYS.length) {
-    API_KEYS[keyIndex].remaining = remaining
-    API_KEYS[keyIndex].limit = limit
-    API_KEYS[keyIndex].resetTime = resetTime
-    API_KEYS[keyIndex].lastUsed = Date.now()
+    API_KEYS[keyIndex].remaining = remaining;
+    API_KEYS[keyIndex].quota_limit = quota_limit;
+    API_KEYS[keyIndex].resetTime = resetTime;
+    API_KEYS[keyIndex].lastUsed = Date.now();
+    // Đồng bộ lên Supabase
+    if (supabase) {
+      supabase.from('api_key_status').upsert({
+        key: API_KEYS[keyIndex].key,
+        remaining,
+        quota_limit,
+        reset_time: resetTime,
+        last_used: API_KEYS[keyIndex].lastUsed,
+        is_active: API_KEYS[keyIndex].isActive
+      }, { onConflict: 'key' });
+    }
   }
 }
 
@@ -250,7 +302,7 @@ export async function optimizedRapidApiCall(
     // Update quota information from response headers
     // Use the correct quota headers: x-ratelimit-requests-*
     const remaining = parseInt(response.headers.get('x-ratelimit-requests-remaining') || '0')
-    const limit = parseInt(response.headers.get('x-ratelimit-requests-limit') || '200')
+    const quota_limit = parseInt(response.headers.get('x-ratelimit-requests-limit') || '200')
     
     // Handle reset time (x-ratelimit-rapid-free-plans-hard-limit-reset)
     const resetHeader = response.headers.get('x-ratelimit-rapid-free-plans-hard-limit-reset')
@@ -259,9 +311,9 @@ export async function optimizedRapidApiCall(
     // Find the key index that was used
     const usedKeyIndex = API_KEYS.findIndex(k => k.key === keyInfo.key)
     if (usedKeyIndex >= 0) {
-      updateKeyQuota(usedKeyIndex, remaining, limit, resetTime)
+      updateKeyQuota(usedKeyIndex, remaining, quota_limit, resetTime)
       // Log quota update for debugging
-      console.log(`API Key ${usedKeyIndex}: Updated quota - ${remaining}/${limit}, Reset: ${new Date(resetTime).toLocaleString()}`)
+      console.log(`API Key ${usedKeyIndex}: Updated quota - ${remaining}/${quota_limit}, Reset: ${new Date(resetTime).toLocaleString()}`)
     }
     
     if (!response.ok) {
@@ -336,7 +388,7 @@ export function getApiKeyStatus() {
   return API_KEYS.map((key, index) => ({
     index,
     remaining: key.remaining,
-    limit: key.limit,
+    limit: key.quota_limit,
     isActive: key.isActive,
     lastUsed: key.lastUsed,
     resetTime: key.resetTime
