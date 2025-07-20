@@ -12,6 +12,64 @@ const inter = Inter({
 });
 
 export const metadata = {
+  title: {
+    default: 'Facebook ID Finder - Free Lookup Tools | Seedingvn.vn',
+    template: '%s | Seedingvn.vn'
+  },
+  description: 'A complete suite of free Facebook ID lookup tools by Seedingvn.vn. Easily find the ID for any Page, Profile, Post, or Group in seconds. No login required.',
+  keywords: ['facebook id finder', 'get facebook id', 'facebook page id', 'facebook post id', 'facebook group id', 'seedingvn'],
+  authors: [{ name: 'Seedingvn.vn' }],
+  creator: 'Seedingvn.vn',
+  publisher: 'Seedingvn.vn',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://id.seedingvn.vn'),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'vi_VN',
+    url: 'https://id.seedingvn.vn',
+    siteName: 'Seedingvn.vn',
+    title: 'Facebook ID Finder - Free Lookup Tools | Seedingvn.vn',
+    description: 'A complete suite of free Facebook ID lookup tools by Seedingvn.vn. Easily find the ID for any Page, Profile, Post, or Group in seconds. No login required.',
+    images: [
+      {
+        url: '/id-facebook-vi.png',
+        width: 1200,
+        height: 630,
+        alt: 'Facebook ID Extractor - Seedingvn.vn',
+      },
+      {
+        url: '/favicon-32x32.png',
+        width: 32,
+        height: 32,
+        alt: 'Seedingvn.vn Logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Facebook ID Finder - Free Lookup Tools | Seedingvn.vn',
+    description: 'A complete suite of free Facebook ID lookup tools by Seedingvn.vn. Easily find the ID for any Page, Profile, Post, or Group in seconds. No login required.',
+    images: ['/id-facebook-vi.png'],
+    creator: '@seedingvn',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   icons: {
     icon: [
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },

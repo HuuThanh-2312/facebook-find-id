@@ -6,8 +6,10 @@ import { ExpandableContent } from "@/components/expandable-content";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://id.seedingvn.vn'),
   title: "Find My Facebook ID (Page & Profile) - Free ID Finder | Seedingvn.vn",
   description: "Need to find your Facebook ID? Paste any FB Page or Profile URL to get the numeric ID instantly. Our free Facebook ID lookup tool is fast, accurate, and requires no login.",
+  keywords: ["find my facebook id", "get facebook id", "facebook id finder", "facebook page id finder", "facebook id lookup", "how to find facebook id"],
   openGraph: {
     title: "Find My Facebook ID (Page & Profile) - Free ID Finder | Seedingvn.vn",
     description: "Need to find your Facebook ID? Paste any FB Page or Profile URL to get the numeric ID instantly. Our free Facebook ID lookup tool is fast, accurate, and requires no login.",

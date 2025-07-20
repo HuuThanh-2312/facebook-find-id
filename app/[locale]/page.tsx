@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/c
 import { Button } from "@/components/ui/button"
 import { ArrowRightIcon } from "lucide-react"
 import { dictionaries } from "@/lib/translations"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 // Dynamic metadata based on locale
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -54,12 +55,12 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
           "@context": "https://schema.org",
           "@type": "WebSite",
           "name": "Seedingvn.vn",
-          "url": "https://seedingvn.vn/",
+          "url": "https://id.seedingvn.vn/",
           "potentialAction": {
             "@type": "SearchAction",
             "target": {
               "@type": "EntryPoint",
-              "urlTemplate": "https://seedingvn.vn/search?q={search_term_string}"
+              "urlTemplate": "https://id.seedingvn.vn/search?q={search_term_string}"
             },
             "query-input": "required name=search_term_string"
           }
@@ -68,13 +69,49 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
           "@context": "https://schema.org",
           "@type": "Organization",
           "name": "Seedingvn.vn",
-          "url": "https://seedingvn.vn/",
-          "logo": "https://seedingvn.vn/logo.png",
+          "url": "https://id.seedingvn.vn/",
+          "logo": "https://id.seedingvn.vn/favicon-32x32.png",
           "contactPoint": {
             "@type": "ContactPoint",
             "contactType": "Customer Support",
             "email": "support@seedingvn.vn"
           }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": locale === 'en' ? "What is a Facebook ID?" : "Facebook ID là gì?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": locale === 'en' ? 
+                  "Facebook ID (or UID) is a unique numerical identifier that Facebook uses to identify a specific object (account, page, group, post...). This ID is extremely important for developers and marketers when working with Facebook's tools and APIs." :
+                  "Facebook ID (hay UID) là một dãy số định danh duy nhất mà Facebook sử dụng để xác định một đối tượng cụ thể (tài khoản, trang, nhóm, bài viết...). ID này cực kỳ quan trọng đối với các nhà phát triển và marketer khi làm việc với các công cụ và API của Facebook."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": locale === 'en' ? "How to find Facebook ID?" : "Cách tìm Facebook ID?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": locale === 'en' ?
+                  "Simply paste the Facebook URL (Page, Post, or Group) into our tool and click 'Extract ID'. Our free tool will instantly return the numeric ID you need." :
+                  "Chỉ cần dán URL Facebook (Trang, Bài viết, hoặc Nhóm) vào công cụ của chúng tôi và nhấn 'Tìm ID'. Công cụ miễn phí sẽ ngay lập tức trả về ID số bạn cần."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": locale === 'en' ? "Is this tool free to use?" : "Công cụ này có miễn phí không?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": locale === 'en' ?
+                  "Yes, our Facebook ID finder tool is completely free to use. No registration, no login required, and no usage limits." :
+                  "Có, công cụ tìm ID Facebook của chúng tôi hoàn toàn miễn phí. Không cần đăng ký, không cần đăng nhập và không giới hạn sử dụng."
+              }
+            }
+          ]
         }
       ])
     }
@@ -177,6 +214,48 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="w-full mt-8 flex justify-center">
           <Slideshow images={slideshowImages} interval={6000} />
         </div>
+      </div>
+
+      {/* FAQ Section */}
+      <div className="max-w-4xl mx-auto px-4 mt-12 md:mt-20">
+        <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6 text-center">
+          {locale === 'en' ? 'Frequently Asked Questions' : 'Câu Hỏi Thường Gặp'}
+        </h2>
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="item-1">
+            <AccordionTrigger className="text-base md:text-lg font-semibold">
+              {locale === 'en' ? 'What is a Facebook ID?' : 'Facebook ID là gì?'}
+            </AccordionTrigger>
+            <AccordionContent>
+              {locale === 'en' ? 
+                "Facebook ID (or UID) is a unique numerical identifier that Facebook uses to identify a specific object (account, page, group, post...). This ID is extremely important for developers and marketers when working with Facebook's tools and APIs." :
+                "Facebook ID (hay UID) là một dãy số định danh duy nhất mà Facebook sử dụng để xác định một đối tượng cụ thể (tài khoản, trang, nhóm, bài viết...). ID này cực kỳ quan trọng đối với các nhà phát triển và marketer khi làm việc với các công cụ và API của Facebook."
+              }
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-2">
+            <AccordionTrigger className="text-base md:text-lg font-semibold">
+              {locale === 'en' ? 'How to find Facebook ID?' : 'Cách tìm Facebook ID?'}
+            </AccordionTrigger>
+            <AccordionContent>
+              {locale === 'en' ?
+                "Simply paste the Facebook URL (Page, Post, or Group) into our tool and click 'Extract ID'. Our free tool will instantly return the numeric ID you need." :
+                "Chỉ cần dán URL Facebook (Trang, Bài viết, hoặc Nhóm) vào công cụ của chúng tôi và nhấn 'Tìm ID'. Công cụ miễn phí sẽ ngay lập tức trả về ID số bạn cần."
+              }
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-3">
+            <AccordionTrigger className="text-base md:text-lg font-semibold">
+              {locale === 'en' ? 'Is this tool free to use?' : 'Công cụ này có miễn phí không?'}
+            </AccordionTrigger>
+            <AccordionContent>
+              {locale === 'en' ?
+                "Yes, our Facebook ID finder tool is completely free to use. No registration, no login required, and no usage limits." :
+                "Có, công cụ tìm ID Facebook của chúng tôi hoàn toàn miễn phí. Không cần đăng ký, không cần đăng nhập và không giới hạn sử dụng."
+              }
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
 
       {/* SEO Content Section */}
