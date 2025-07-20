@@ -56,7 +56,12 @@
     "footerSection4Link2": "Privacy policy",
     "footerSection4Link3": "Terms of service",
     "notFoundId": "ID not found. Please check the URL or try again in a few minutes.",
-    "pleaseEnterUrl": "Please enter a URL"
+    "pleaseEnterUrl": "Please enter a URL",
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundDesc": "Sorry, the page you are looking for does not exist or has been moved.",
+    "backToHome": "Back to Home",
+    "goBack": "Go Back",
+    "popularPages": "Or try these popular pages:"
   },
   "homePage": {
     "title": "Facebook ID Finder - Free Lookup Tools | Seedingvn.vn",

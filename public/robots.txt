@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Disallow admin/management pages
+Disallow: /trueblue/
+
+# Sitemap
+Sitemap: https://id.seedingvn.vn/sitemap.xml
+
+# Crawl-delay (optional)
+Crawl-delay: 1 
