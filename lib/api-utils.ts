@@ -31,7 +31,7 @@ interface ApiKeyInfo {
 // API Keys configuration - Monthly quota (200 requests per month)
 const API_KEYS: ApiKeyInfo[] = [
   {
-    key: 'f0da5a91b0msha42bb6cc03b3d9fp12e539jsn04b059f7f323',
+    key: 'c920e5d0demsh98727e9df4e0e0fp1e7e04jsn96ea9ac03340',
     remaining: 0, // Will be updated from Supabase
     quota_limit: 200,
     resetTime: 0,

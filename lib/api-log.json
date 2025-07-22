@@ -341,5 +341,19 @@
     "link": "đâsdasda",
     "status": 202,
     "latency": 1572
+  },
+  {
+    "timestamp": 1753191045950,
+    "endpoint": "get_facebook_page_id",
+    "link": "https://www.facebook.com/duongnguyen20222",
+    "status": 200,
+    "latency": 664
+  },
+  {
+    "timestamp": 1753191180919,
+    "endpoint": "get_facebook_page_id",
+    "link": "https://www.facebook.com/hoangnam25mkt",
+    "status": 200,
+    "latency": 2861
   }
 ]
