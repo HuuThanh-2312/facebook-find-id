@@ -49,7 +49,7 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
 
     // Kiểm tra url facebook hợp lệ trước khi gọi API
     if (!isValidFacebookUrl(inputUrl)) {
-      return { id: null, extractionStatus: "error", message: tString("notFoundId") }
+      return { id: null, extractionStatus: "error", message: tString("common.notFoundId") }
     }
 
     let apiEndpoint = ""
