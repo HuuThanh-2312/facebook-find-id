@@ -334,5 +334,12 @@
     "link": "ádasd",
     "status": 202,
     "latency": 1041
+  },
+  {
+    "timestamp": 1753188500567,
+    "endpoint": "get_facebook_post_id",
+    "link": "đâsdasda",
+    "status": 202,
+    "latency": 1572
   }
 ]

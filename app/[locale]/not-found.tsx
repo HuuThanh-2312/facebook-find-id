@@ -4,13 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { HomeIcon, ArrowLeftIcon, SearchIcon } from 'lucide-react'
 import { dictionaries } from '@/lib/translations'
 
-export default async function LocaleNotFound({ 
-  params 
-}: { 
-  params: Promise<{ locale: string }> 
-}) {
-  const resolvedParams = await params
-  const locale = resolvedParams.locale
+export default async function LocaleNotFound({ params }: { params?: Promise<{ locale?: string }> }) {
+  let locale = 'en';
+  if (params) {
+    const resolvedParams = await params;
+    locale = resolvedParams?.locale || 'en';
+  }
   const dict = (dictionaries[locale as keyof typeof dictionaries] || dictionaries["en"]) as any
 
   // Fallback text if translation is missing
