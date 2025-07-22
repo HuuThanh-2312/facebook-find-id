@@ -21,7 +21,9 @@ interface ExtractionResult {
 }
 
 function isValidFacebookUrl(url: string) {
-  return /^(https?:\/\/)?(www\.)?(facebook|fb)\.com/.test(url.trim());
+  const trimmed = url.trim();
+  // Chỉ pass nếu bắt đầu bằng http(s):// hoặc www. và domain facebook.com hoặc fb.com
+  return /^(https?:\/\/)?(www\.)?(facebook|fb)\.com(\/|$)/.test(trimmed);
 }
 
 export function IdExtractorForm({ type }: IdExtractorFormProps) {
