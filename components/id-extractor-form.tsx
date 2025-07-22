@@ -20,6 +20,10 @@ interface ExtractionResult {
   copyFeedback: boolean // New state for individual copy button feedback
 }
 
+function isValidFacebookUrl(url: string) {
+  return /^(https?:\/\/)?(www\.)?(facebook|fb)\.com/.test(url.trim());
+}
+
 export function IdExtractorForm({ type }: IdExtractorFormProps) {
   const { t } = useTranslation()
   const [urlInput, setUrlInput] = useState("") // For single URL
@@ -39,6 +43,11 @@ export function IdExtractorForm({ type }: IdExtractorFormProps) {
   ): Promise<{ id: string | null; extractionStatus: "success" | "error" | "info"; message: string; status?: number; latency?: number }> => {
     if (!inputUrl) {
       return { id: null, extractionStatus: "error", message: tString("common.invalidUrl") }
+    }
+
+    // Kiểm tra url facebook hợp lệ trước khi gọi API
+    if (!isValidFacebookUrl(inputUrl)) {
+      return { id: null, extractionStatus: "error", message: tString("notFoundId") }
     }
 
     let apiEndpoint = ""
