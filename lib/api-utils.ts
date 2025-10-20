@@ -253,14 +253,24 @@ export async function optimizedRapidApiCall(
   }
 
   // Get available API key
-  const keyInfo = getNextAvailableKey()
-  if (!keyInfo) {
-    console.error("No available API keys with remaining quota")
-    return NextResponse.json({ 
-      error: "Service temporarily unavailable - all API quotas exhausted",
-      retryAfter: Math.max(...API_KEYS.map(k => k.resetTime - Date.now()).filter(t => t > 0)) / 1000
-    }, { status: 503 })
-  }
+let keyInfo = getNextAvailableKey()
+
+  // **LOGIC MỚI: Nếu bộ nhớ báo hết key, hãy thử đồng bộ lại từ Supabase**
+  if (!keyInfo) {
+    console.log("In-memory keys exhausted, re-syncing from Supabase...");
+    await syncQuotaFromSupabase(); // Đồng bộ lại
+    keyInfo = getNextAvailableKey(); // Thử lấy key một lần nữa với dữ liệu mới
+
+    // Nếu đồng bộ xong mà VẪN không có key, thì mới là hết key thật
+    if (!keyInfo) {
+      console.error("Re-sync complete. No available API keys with remaining quota.")
+      return NextResponse.json({ 
+        error: "Service temporarily unavailable - all API quotas exhausted",
+        retryAfter: Math.max(...API_KEYS.map(k => k.resetTime - Date.now()).filter(t => t > 0)) / 1000
+      }, { status: 503 })
+    }
+    console.log("Re-sync successful, found valid key.");
+  }
 
   const url = `https://facebook-scraper-api4.p.rapidapi.com/${config.endpoint}?link=${encodeURIComponent(link)}`
   
